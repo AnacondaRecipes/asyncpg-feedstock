@@ -23,7 +23,9 @@ requirements:
     - {{ compiler('c') }}
   host:
     - python
-    - cython
+    # setup.py specifies the exact Cython version. This is not really needed
+    # without this setuptools will try to download Cython
+    - cython 0.28.4
     - setuptools
   run:
     - python
