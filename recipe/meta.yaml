@@ -1,6 +1,6 @@
-{% set name = "asyncpg" %}
-{% set version = "0.18.3" %}
-{% set sha256 = "58a5eccaac60fd326e32683226efe1046bfea558fa043360bdd1708e0e812c67" %}
+% set name = "asyncpg" %}
+{% set version = "0.20.1" %}
+{% set sha256 = "394bf19bdddbba07a38cd6fb526ebf66e120444d6b3097332b78efd5b26495b0" %}
 
 package:
   name: {{ name|lower }}
@@ -20,11 +20,13 @@ requirements:
   build:
     - {{ compiler('c') }}
   host:
+    - {{ compiler('c') }}
+  host:
     - python
     - pip
     # setup.py specifies the exact Cython version. This is not really needed
     # without this setuptools will try to download Cython
-    - cython 0.29.0
+    - cython
   run:
     - python
 
