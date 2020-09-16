@@ -1,4 +1,4 @@
-% set name = "asyncpg" %}
+{% set name = "asyncpg" %}
 {% set version = "0.20.1" %}
 {% set sha256 = "394bf19bdddbba07a38cd6fb526ebf66e120444d6b3097332b78efd5b26495b0" %}
 
