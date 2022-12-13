@@ -1,6 +1,6 @@
 {% set name = "asyncpg" %}
-{% set version = "0.23.0" %}
-{% set sha256 = "812dafa4c9e264d430adcc0f5899f0dc5413155a605088af696f952d72d36b5e" %}
+{% set version = "0.27.0" %}
+{% set sha256 = "720986d9a4705dd8a40fdf172036f5ae787225036a7eb46e704c45aa8f62c054" %}
 
 package:
   name: {{ name|lower }}
@@ -14,30 +14,34 @@ source:
 build:
   number: 0
   script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
-  skip: True  # [py<35]
+  skip: True  # [py<37]
 
 requirements:
   build:
     - {{ compiler('c') }}
   host:
-    - {{ compiler('c') }}
-  host:
     - python
     - pip
+    - setuptools
+    - wheel
     # setup.py specifies the exact Cython version. This is not really needed
     # without this setuptools will try to download Cython
     - cython
   run:
     - python
-    - typing_extensions >=3.7.4.3   #[py<38]
+    - typing_extensions >=3.7.4.3  # [py<38]
 
 test:
   imports:
     - asyncpg
+  commands:
+    - pip check
+  requires:
+    - pip
 
 about:
   home: https://github.com/MagicStack/asyncpg
-  license: Apache 2.0
+  license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
   summary: A fast PostgreSQL Database Client Library for Python/asyncio.
