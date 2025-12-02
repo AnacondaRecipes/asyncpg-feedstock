@@ -1,5 +1,5 @@
 {% set name = "asyncpg" %}
-{% set version = "0.30.0" %}
+{% set version = "0.31.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,12 +7,12 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: c551e9928ab6707602f44811817f82ba3c446e018bfe1d3abecc8ba5f3eac851
+  sha256: c989386c83940bfbd787180f2b1519415e2d3d6277a70d9d0f0145ac73500735
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation .
-  skip: true  # [py<38]
+  skip: true  # [py<390]
 
 requirements:
   build:
@@ -20,12 +20,12 @@ requirements:
   host:
     - python
     - pip
-    - setuptools >=60
-    - wheel
-    - cython >=0.29.24,<4.0.0
+    - setuptools >=77.0.3
+    - cython >=3.2.1,<4.0.0
   run:
     - python
     - async-timeout >=4.0.3  # [py<311]
+    - async_timeout >=4.0.3  # [py<311]
 
 test:
   imports:
