@@ -12,7 +12,7 @@ source:
 build:
   number: 0
   script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation .
-  skip: true  # [py<390]
+  skip: true  # [py<39]
 
 requirements:
   build:
@@ -25,15 +25,34 @@ requirements:
   run:
     - python
     - async-timeout >=4.0.3  # [py<311]
-    - async_timeout >=4.0.3  # [py<311]
+
+# missgin postgresql-contrib package
+# E   asyncpg.exceptions.FeatureNotSupportedError: extension "hstore" is not available
+# E   DETAIL:  Could not open extension control file "$PREFIX/share/extension/hstore.control": No such file or directory.
+# E   HINT:  The extension must first be installed on the system where PostgreSQL is running.
+{% set deselect_tests = "" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_custom_codec_binary" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_custom_codec_text" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_extra_codec_alias" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_unhandled_type_fallback" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_unknown_type_text_fallback" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_introspection.py::TestIntrospection::test_introspection_no_stmt_cache_01" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_introspection.py::TestIntrospection::test_introspection_no_stmt_cache_02" %}
 
 test:
+  source_files:
+    - tests
   imports:
     - asyncpg
+  requires:
+    - pip 
+    - pytest
+    - distro
+    - postgresql
   commands:
     - pip check
-  requires:
-    - pip
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v tests {{ deselect_tests }}
 
 about:
   home: https://github.com/MagicStack/asyncpg
