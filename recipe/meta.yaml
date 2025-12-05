@@ -49,6 +49,7 @@ test:
     - pytest
     - distro
     - postgresql
+    - sspilib  # [win]
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
