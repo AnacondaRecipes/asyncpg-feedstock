@@ -1,5 +1,5 @@
 {% set name = "asyncpg" %}
-{% set version = "0.30.0" %}
+{% set version = "0.31.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,33 +7,54 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: c551e9928ab6707602f44811817f82ba3c446e018bfe1d3abecc8ba5f3eac851
+  sha256: c989386c83940bfbd787180f2b1519415e2d3d6277a70d9d0f0145ac73500735
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation .
-  skip: true  # [py<38]
+  skip: true  # [py<39]
 
 requirements:
   build:
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
   host:
     - python
     - pip
-    - setuptools >=60
-    - wheel
-    - cython >=0.29.24,<4.0.0
+    - setuptools >=77.0.3
+    - cython >=3.2.1,<4.0.0
   run:
     - python
     - async-timeout >=4.0.3  # [py<311]
 
+# missing postgresql-contrib package
+# E   asyncpg.exceptions.FeatureNotSupportedError: extension "hstore" is not available
+# E   DETAIL:  Could not open extension control file "$PREFIX/share/extension/hstore.control": No such file or directory.
+# E   HINT:  The extension must first be installed on the system where PostgreSQL is running.
+{% set deselect_tests = "" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_custom_codec_binary" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_custom_codec_text" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_extra_codec_alias" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_unhandled_type_fallback" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_codecs.py::TestCodecs::test_unknown_type_text_fallback" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_introspection.py::TestIntrospection::test_introspection_no_stmt_cache_01" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_introspection.py::TestIntrospection::test_introspection_no_stmt_cache_02" %}
+
 test:
+  source_files:
+    - tests
   imports:
     - asyncpg
+  requires:
+    - pip 
+    - pytest
+    - distro
+    - postgresql
+    - sspilib  # [win]
   commands:
     - pip check
-  requires:
-    - pip
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v tests {{ deselect_tests }}
 
 about:
   home: https://github.com/MagicStack/asyncpg
